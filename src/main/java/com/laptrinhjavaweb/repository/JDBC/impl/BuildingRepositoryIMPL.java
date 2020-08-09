@@ -2,7 +2,6 @@ package com.laptrinhjavaweb.repository.JDBC.impl;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,8 +15,6 @@ import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.repository.JDBC.BuildingRepository;
 
 public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingRepository {
-
-	
 
 	@Override
 	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
@@ -76,25 +73,22 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 									+ field.get(buildingSearchBuilder));
 						}
 					}
+				} else {
+					if (field.getName().equals("rentPriceFrom") && field.get(buildingSearchBuilder) != null) {
+						stringBuilder.append(" and " + field.get(buildingSearchBuilder) + " <= b.rentprice");
+					} else if (field.getName().equals("rentPriceTo") && field.get(buildingSearchBuilder) != null) {
+						stringBuilder.append(" and " + field.get(buildingSearchBuilder) + " >= b.rentprice");
+					}
 				}
 			}
-
-			if (buildingSearchBuilder.getRentPriceFrom() != null) {
-				stringBuilder.append(" and " + buildingSearchBuilder.getRentPriceFrom() + " <= b.rentprice");
-			}
-			if (buildingSearchBuilder.getRentPriceTo() != null) {
-				stringBuilder.append(" and " + buildingSearchBuilder.getRentPriceTo() + " >= b.rentprice");
-			}
+			String prefix = " and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value";
 			if (buildingSearchBuilder.getRentAreaFrom() != null & buildingSearchBuilder.getRentAreaTo() != null) {
-				stringBuilder.append(" and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value between "
-								+ buildingSearchBuilder.getRentAreaFrom() + " and "
-								+ buildingSearchBuilder.getRentAreaTo() + "))");
+				stringBuilder.append(prefix + "between " + buildingSearchBuilder.getRentAreaFrom() + " and "
+								     										   + buildingSearchBuilder.getRentAreaTo() + "))");
 			} else if (buildingSearchBuilder.getRentPriceFrom() != null) {
-				stringBuilder.append(" and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value >="
-						+ buildingSearchBuilder.getRentPriceFrom() + "))");
+				stringBuilder.append(prefix + " >= " + buildingSearchBuilder.getRentPriceFrom() + "))");
 			} else
-				stringBuilder.append(" and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value <="
-						+ buildingSearchBuilder.getRentPriceTo() + "))");
+				stringBuilder.append(prefix + " <= " + buildingSearchBuilder.getRentPriceTo() + "))");
 
 			if (buildingSearchBuilder.getStaffNameAssimentBuilding() != null) {
 				stringBuilder
@@ -103,14 +97,14 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 			if (buildingSearchBuilder.getStaffPhoneAssimentBuilding() != null) {
 				stringBuilder.append(" and u.phone = '" + buildingSearchBuilder.getStaffPhoneAssimentBuilding() + "'");
 			}
-
 			if (buildingSearchBuilder.getTypes() != null) {
+				int lengthType = buildingSearchBuilder.getTypes().length;
 				stringBuilder.append(" and (b.type like '%" + buildingSearchBuilder.getTypes()[0] + "%'");
-				if (buildingSearchBuilder.getTypes().length == 3) {
-					stringBuilder.append(" or b.type like '%" + buildingSearchBuilder.getTypes()[1] + "%'");
-					stringBuilder.append(" or b.type like '%" + buildingSearchBuilder.getTypes()[2] + "%'");
-				} else if (buildingSearchBuilder.getTypes().length == 2)
-					stringBuilder.append(" or b.type like '%" + buildingSearchBuilder.getTypes()[1] + "%'");
+				for (int i =1; i < lengthType ; i++) {
+					if ( i >= 1) {
+						stringBuilder.append(" or b.type like '%" + buildingSearchBuilder.getTypes()[i] + "%'");
+					}	
+				}
 				stringBuilder.append(")");
 			}
 			return stringBuilder.toString();
@@ -157,7 +151,8 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 				}
 				if (statement != null) {
 					statement.close();
-				}if (resultSet != null) {
+				}
+				if (resultSet != null) {
 					resultSet.close();
 				}
 			} catch (SQLException e) {
@@ -213,7 +208,7 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 					} else if (fields[i].get(buildingDTO) == null) {
 						statement.setNull(i, Types.NULL);
 					}
-				}else if (fields[i].getName().equals("type")) {
+				} else if (fields[i].getName().equals("type")) {
 					statement.setString(i, convertTypeToString(buildingDTO.getType()));
 				}
 			} catch (IllegalArgumentException | IllegalAccessException | SQLException e) {
