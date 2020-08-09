@@ -1,8 +1,11 @@
 package com.laptrinhjavaweb.dto;
 
+import java.util.Date;
 
-public class BuildingDTO extends AbstrackClass{
+public class BuildingDTO {
 	
+	private long id;
+	private String name;
 	private String street;
 	private String ward;
 	private String district;
@@ -24,12 +27,68 @@ public class BuildingDTO extends AbstrackClass{
 	private String renttime;
 	private String decorationtime;
 	private Double brokeragetee;
-	private TypeOfBuilding type;
 	private String note;
 	private String linkofbuilding;
 	private String map;
 	private String avatar;
+	private String[] type;
+	private String createdby;
+	private Date createddate;
+	private String modifiedby;
+	private Date modifieddate;
+	private String rentArea;
 	
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getCreatedby() {
+		return createdby;
+	}
+	public void setCreatedby(String createdby) {
+		this.createdby = createdby;
+	}
+	public Date getCreateddate() {
+		return createddate;
+	}
+	public void setCreateddate(Date createddate) {
+		this.createddate = createddate;
+	}
+	public String getModifiedby() {
+		return modifiedby;
+	}
+	public void setModifiedby(String modifiedby) {
+		this.modifiedby = modifiedby;
+	}
+	public Date getModifieddate() {
+		return modifieddate;
+	}
+	public void setModifieddate(Date modifieddate) {
+		this.modifieddate = modifieddate;
+	}
+	public String getRentArea() {
+		return rentArea;
+	}
+	public void setRentArea(String rentArea) {
+		this.rentArea = rentArea;
+	}
+	
+	
+	
+	public String[] getType() {
+		return type;
+	}
+	public void setType(String[] type) {
+		this.type = type;
+	}
 	public String getStreet() {
 		return street;
 	}
@@ -181,10 +240,5 @@ public class BuildingDTO extends AbstrackClass{
 	public void setNumberOfBasement(Integer numberOfBasement) {
 		this.numberOfBasement = numberOfBasement;
 	}
-	public TypeOfBuilding getType() {
-		return type;
-	}
-	public void setType(TypeOfBuilding type) {
-		this.type = type;
-	}
+	
 }

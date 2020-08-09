@@ -17,7 +17,7 @@ public class BuildingSearchBuilder {
 	private String staffNameAssimentBuilding;
 	private String staffPhoneAssimentBuilding;
 	private String chooseStaffNameAssimentBuilding;
-	private String typeBuilding;
+	private String[] types = new String[] {};
 
 	public Integer getRentAreaFrom() {
 		return rentAreaFrom;
@@ -47,9 +47,6 @@ public class BuildingSearchBuilder {
 		return chooseStaffNameAssimentBuilding;
 	}
 
-	public String getTypeBuilding() {
-		return typeBuilding;
-	}
 
 	public String getName() {
 		return name;
@@ -99,8 +96,12 @@ public class BuildingSearchBuilder {
 			this.rentPriceTo=builder.rentPriceTo;
 			this.staffNameAssimentBuilding=builder.staffNameAssimentBuilding;
 			this.staffPhoneAssimentBuilding=builder.staffPhoneAssimentBuilding;
-			this.typeBuilding=builder.typeBuilding;
+			this.types=builder.types;
 		}
+
+	public String[] getTypes() {
+		return types;
+	}
 
 	// Builder Class
 	public static class Builder {
@@ -120,7 +121,8 @@ public class BuildingSearchBuilder {
 		private String staffNameAssimentBuilding;
 		private String staffPhoneAssimentBuilding;
 		private String chooseStaffNameAssimentBuilding;
-		private String typeBuilding;
+		private String[] types = new String[] {};
+
 
 		public Builder setRentAreaFrom(Integer rentAreaFrom) {
 			this.rentAreaFrom = rentAreaFrom;
@@ -157,10 +159,6 @@ public class BuildingSearchBuilder {
 			return this;
 		}
 
-		public Builder setTypeBuilding(String typeBuilding) {
-			this.typeBuilding = typeBuilding;
-			return this;
-		}
 
 		public Builder setName(String name) {
 			this.name = name;
@@ -202,9 +200,15 @@ public class BuildingSearchBuilder {
 			return this;
 		}
 		
+		public Builder setTypes(String[] types) {
+			this.types = types;
+			return this;
+		}
+		
 		public BuildingSearchBuilder build() {
 			return new BuildingSearchBuilder(this);
 		}
+
 
 	}
 }

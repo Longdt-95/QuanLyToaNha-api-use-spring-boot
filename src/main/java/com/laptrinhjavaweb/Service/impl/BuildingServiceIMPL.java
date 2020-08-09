@@ -16,5 +16,10 @@ public class BuildingServiceIMPL implements BuildingService {
 	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
 		return buildingRepository.getBuildings(buildingSearchBuilder);
 	}
+
+	@Override
+	public long saveBuilding(BuildingDTO buildingDTO) {
+		return buildingRepository.saveBuilding(buildingDTO);
+	}
 	
 }

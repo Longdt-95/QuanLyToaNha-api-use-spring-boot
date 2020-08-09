@@ -5,11 +5,15 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.laptrinhjavaweb.Service.BuildingService;
+import com.laptrinhjavaweb.Service.RentAreaBuildingService;
 import com.laptrinhjavaweb.Service.impl.BuildingServiceIMPL;
+import com.laptrinhjavaweb.Service.impl.RentAreaBuildingServiceIMPL;
 import com.laptrinhjavaweb.builder.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 
@@ -17,14 +21,25 @@ import com.laptrinhjavaweb.dto.BuildingDTO;
 public class BuildingAPI {
 
 	private BuildingService buildingService = new BuildingServiceIMPL();
+	private RentAreaBuildingService rentAreaService = new RentAreaBuildingServiceIMPL();
+	
 
 	@GetMapping("/buildings")
-	public List<BuildingDTO> getBuildings(@RequestParam Map<String, String> requestParams) {
-		BuildingSearchBuilder buildingSearchBuilder = convertMapToBuilder(requestParams);
+	public List<BuildingDTO> getBuildings(@RequestParam Map<String, String> requestParams, @RequestParam String[] type) {
+		BuildingSearchBuilder buildingSearchBuilder = convertMapToBuilder(requestParams, type);
 		return buildingService.getBuildings(buildingSearchBuilder);
 	}
 
-	private BuildingSearchBuilder convertMapToBuilder(Map<String, String> requestParams) {
+	@PostMapping ("/buildings")
+	public long saveBuilding(@RequestBody BuildingDTO buildingDTO) {
+		long id;
+		id = buildingService.saveBuilding(buildingDTO);
+		rentAreaService.saveRentAreaBuilding(buildingDTO, id);
+		return id;
+	}
+	
+	
+	private BuildingSearchBuilder convertMapToBuilder(Map<String, String> requestParams, String[] type) {
 
 		Integer numberOfBasement = requestParams.containsKey("numberOfBasement")
 				? (StringUtils.isNoneBlank(requestParams.get("numberOfBasement"))
@@ -76,7 +91,7 @@ public class BuildingAPI {
 				.setStaffPhoneAssimentBuilding(requestParams.containsKey("staffPhoneAssimentBuilding")
 						? requestParams.get("staffPhoneAssimentBuilding")
 						: null)
-				.setTypeBuilding(requestParams.containsKey("typeBuilding") ? requestParams.get("typeBuilding") : null)
+				.setTypes(type)
 				.build();
 		return builder;
 	}
