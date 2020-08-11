@@ -14,7 +14,7 @@ import com.laptrinhjavaweb.builder.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.repository.JDBC.BuildingRepository;
 
-public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingRepository {
+public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> implements BuildingRepository {
 
 	@Override
 	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
@@ -161,6 +161,7 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 		}
 	}
 
+	// buildSQLQuery insertBuilding
 	private String buildSQLInsertBuilding(BuildingDTO buildingDTO) {
 		Field[] fields = BuildingDTO.class.getDeclaredFields();
 		StringBuilder name = new StringBuilder();
@@ -183,16 +184,17 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 		return sql;
 	}
 
+	// convert Type from array to String
 	private String convertTypeToString(String[] type) {
 		StringBuilder stringBuilder = new StringBuilder();
-		String types;
 		for (String string : type) {
 			stringBuilder.append(string + ",");
 		}
-		types = stringBuilder.toString();
+		String types = stringBuilder.toString();
 		return types.substring(0, types.length() - 1);
 	}
 
+	// set param for sql insertBuilding
 	private void setParameter(PreparedStatement statement, BuildingDTO buildingDTO) {
 		Field[] fields = BuildingDTO.class.getDeclaredFields();
 		for (int i = 0; i < fields.length; i++) {
@@ -216,6 +218,11 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL implements BuildingR
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public BuildingDTO findById(long id) {
+		String sql = "select * from building where id = ?";
+		return findById(sql, id, new BuildingMapper());
 	}
 
 }

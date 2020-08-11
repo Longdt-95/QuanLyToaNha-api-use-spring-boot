@@ -1,5 +1,8 @@
 package com.laptrinhjavaweb.repository.JDBC;
 
-public interface GenericRepo {
+import com.laptrinhjavaweb.Mapper.RowMapper;
+
+public interface GenericRepo<T>{
 	long save(String sql);
+	T findById(String sql, long id,RowMapper<T> rowMapper);
 }

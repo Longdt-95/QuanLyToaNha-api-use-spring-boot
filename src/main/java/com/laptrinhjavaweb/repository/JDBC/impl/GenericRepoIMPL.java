@@ -6,9 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.laptrinhjavaweb.Mapper.RowMapper;
 import com.laptrinhjavaweb.repository.JDBC.GenericRepo;
 
-public class GenericRepoIMPL implements GenericRepo{
+public class GenericRepoIMPL<T> implements GenericRepo<T>{
 	
 	public Connection getConnection() {
 		try {
@@ -22,6 +23,7 @@ public class GenericRepoIMPL implements GenericRepo{
 		}
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public long save(String sql) {
 	
@@ -62,6 +64,41 @@ public class GenericRepoIMPL implements GenericRepo{
 				System.out.println(e.getMessage());
 			}
 		}
+	}
+
+	@Override
+	public T findById(String sql, long id, RowMapper<T> rowMapper) {
+		T t = null;
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		try {
+			connection = getConnection();
+			statement = connection.prepareStatement(sql);
+			statement.setLong(1, id);
+			resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				t = rowMapper.maprow(resultSet);
+			}
+			return t;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+				if (statement != null) {
+					statement.close();
+				}
+				if (resultSet != null) {
+					resultSet.close();
+				}
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		return null;
 	}
 
 }

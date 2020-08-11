@@ -3,7 +3,7 @@ package com.laptrinhjavaweb.repository.JDBC.impl;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.repository.JDBC.RentAreaBuildingRepo;
 
-public class RentAreaBuildingRepoIMPL extends GenericRepoIMPL implements RentAreaBuildingRepo {
+public class RentAreaBuildingRepoIMPL extends GenericRepoIMPL<Object> implements RentAreaBuildingRepo {
 
 	@Override
 	public long[] saveRentAreaBuilding(BuildingDTO buildingDTO, long id) {
@@ -16,6 +16,8 @@ public class RentAreaBuildingRepoIMPL extends GenericRepoIMPL implements RentAre
 		}
 		return idRentArea;
 	}
+	
+	
 
 
 }

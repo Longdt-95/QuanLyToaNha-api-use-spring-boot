@@ -7,5 +7,5 @@ import com.laptrinhjavaweb.dto.BuildingDTO;
 
 public interface BuildingService {
 	List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder);
-	long saveBuilding(BuildingDTO buildingDTO);
+	BuildingDTO findById (BuildingDTO buildingDTO);
 }

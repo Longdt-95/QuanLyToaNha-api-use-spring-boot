@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.laptrinhjavaweb.Service.BuildingService;
-import com.laptrinhjavaweb.Service.RentAreaBuildingService;
 import com.laptrinhjavaweb.Service.impl.BuildingServiceIMPL;
-import com.laptrinhjavaweb.Service.impl.RentAreaBuildingServiceIMPL;
 import com.laptrinhjavaweb.builder.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 
@@ -21,7 +19,7 @@ import com.laptrinhjavaweb.dto.BuildingDTO;
 public class BuildingAPI {
 
 	private BuildingService buildingService = new BuildingServiceIMPL();
-	private RentAreaBuildingService rentAreaService = new RentAreaBuildingServiceIMPL();
+	
 	
 
 	@GetMapping("/buildings")
@@ -31,11 +29,8 @@ public class BuildingAPI {
 	}
 
 	@PostMapping ("/buildings")
-	public long saveBuilding(@RequestBody BuildingDTO buildingDTO) {
-		long id;
-		id = buildingService.saveBuilding(buildingDTO);
-		rentAreaService.saveRentAreaBuilding(buildingDTO, id);
-		return id;
+	public BuildingDTO saveBuilding(@RequestBody BuildingDTO buildingDTO) {
+		return buildingService.findById(buildingDTO);
 	}
 	
 	
