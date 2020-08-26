@@ -1,3 +1,4 @@
+
 package com.laptrinhjavaweb.api;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class BuildingAPI {
 
 	@PostMapping ("/buildings")
 	public BuildingDTO saveBuilding(@RequestBody BuildingDTO buildingDTO) {
-		return buildingService.findById(buildingDTO);
+		return buildingService.saveBuilding(buildingDTO);
 	}
 	
 	

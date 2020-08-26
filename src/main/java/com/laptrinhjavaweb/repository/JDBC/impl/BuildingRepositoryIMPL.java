@@ -5,20 +5,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.laptrinhjavaweb.Mapper.BuildingMapper;
 import com.laptrinhjavaweb.builder.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
+import com.laptrinhjavaweb.enity.BuildingEntity;
 import com.laptrinhjavaweb.repository.JDBC.BuildingRepository;
 
-public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> implements BuildingRepository {
+public class BuildingRepositoryIMPL extends SimpleJpaRepositoryIMPL<BuildingEntity> implements BuildingRepository {
 
 	@Override
-	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
-		List<BuildingDTO> results = new ArrayList<>();
+	public List<BuildingEntity> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
+		List<BuildingEntity> results = new ArrayList<>();
 		BuildingMapper buildingMapper = new BuildingMapper();
 		String sql = "select * from building b join assignmentbuilding a on b.id = a.buildingid join user u on a.staffid = u.id where 1 = 1";
 		sql = buildSQLBuildingSearch(buildingSearchBuilder, sql);
@@ -26,7 +26,7 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
 		try {
-			connection = getConnection();
+			connection = SingletonConnection.getInstance().getConnection();
 			statement = connection.prepareStatement(sql);
 			resultSet = statement.executeQuery();
 			while (resultSet.next()) {
@@ -84,7 +84,7 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 			String prefix = " and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value";
 			if (buildingSearchBuilder.getRentAreaFrom() != null & buildingSearchBuilder.getRentAreaTo() != null) {
 				stringBuilder.append(prefix + "between " + buildingSearchBuilder.getRentAreaFrom() + " and "
-								     										   + buildingSearchBuilder.getRentAreaTo() + "))");
+						+ buildingSearchBuilder.getRentAreaTo() + "))");
 			} else if (buildingSearchBuilder.getRentPriceFrom() != null) {
 				stringBuilder.append(prefix + " >= " + buildingSearchBuilder.getRentPriceFrom() + "))");
 			} else
@@ -100,10 +100,10 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 			if (buildingSearchBuilder.getTypes() != null) {
 				int lengthType = buildingSearchBuilder.getTypes().length;
 				stringBuilder.append(" and (b.type like '%" + buildingSearchBuilder.getTypes()[0] + "%'");
-				for (int i =1; i < lengthType ; i++) {
-					if ( i >= 1) {
+				for (int i = 1; i < lengthType; i++) {
+					if (i >= 1) {
 						stringBuilder.append(" or b.type like '%" + buildingSearchBuilder.getTypes()[i] + "%'");
-					}	
+					}
 				}
 				stringBuilder.append(")");
 			}
@@ -115,27 +115,32 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 
 	}
 
-	@SuppressWarnings("static-access")
-	@Override
-	public long saveBuilding(BuildingDTO buildingDTO) {
-		String sql = "";
-		sql = buildSQLInsertBuilding(buildingDTO);
+	@SuppressWarnings({ "unused", "static-access" })
+	public long saveWithTransaction(BuildingDTO buildingDTO) {
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
-		long id = -1;
+		long buildingId = -1;
 		try {
-			connection = getConnection();
+			connection = SingletonConnection.getInstance().getConnection();
 			connection.setAutoCommit(false);
-			statement = connection.prepareStatement(sql, statement.RETURN_GENERATED_KEYS);
+			String sqlInsertBuilding = buildSQLInsertBuilding(buildingDTO);
+			statement = connection.prepareStatement(sqlInsertBuilding, statement.RETURN_GENERATED_KEYS);
 			setParameter(statement, buildingDTO);
 			statement.executeUpdate();
 			resultSet = statement.getGeneratedKeys();
 			while (resultSet.next()) {
-				id = resultSet.getLong(1);
+				buildingId = resultSet.getLong(1);
+			}
+			String sqlInsertBuildingRentArea = "INSERT INTO rentarea(value, buildingid) values (?,?)";
+			statement = connection.prepareStatement(sqlInsertBuildingRentArea, statement.RETURN_GENERATED_KEYS);
+			for (String string : buildingDTO.getRentAreas()) {
+				statement.setInt(1, Integer.parseInt(string));
+				statement.setLong(2, buildingId);
+				statement.executeUpdate();
 			}
 			connection.commit();
-			return id;
+			return buildingId;
 		} catch (SQLException e) {
 			try {
 				connection.rollback();
@@ -143,7 +148,7 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 				e1.printStackTrace();
 			}
 			System.out.println(e.getMessage());
-			return -1;
+			return buildingId;
 		} finally {
 			try {
 				if (connection != null) {
@@ -157,8 +162,10 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
+				return buildingId;
 			}
 		}
+
 	}
 
 	// buildSQLQuery insertBuilding
@@ -170,7 +177,7 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 		for (int i = 0; i < fields.length; i++) {
 			fields[i].setAccessible(true);
 			try {
-				if (i >= 1 && !fields[i].getName().equals("rentArea")) {
+				if (i >= 1 && !fields[i].getName().equals("rentArea") && !fields[i].getName().equals("rentAreas")) {
 					name.append(fields[i].getName().toLowerCase() + ",");
 					parameter.append("?,");
 				}
@@ -200,29 +207,31 @@ public class BuildingRepositoryIMPL extends GenericRepoIMPL<BuildingDTO> impleme
 		for (int i = 0; i < fields.length; i++) {
 			fields[i].setAccessible(true);
 			try {
-				if (i >= 1 && !fields[i].getName().equals("rentArea") && !fields[i].getName().equals("type")) {
-					if (fields[i].get(buildingDTO) instanceof String) {
-						statement.setString(i, (String) fields[i].get(buildingDTO));
-					} else if (fields[i].get(buildingDTO) instanceof Integer) {
-						statement.setInt(i, (Integer) fields[i].get(buildingDTO));
-					} else if (fields[i].get(buildingDTO) instanceof Double) {
-						statement.setDouble(i, (Double) fields[i].get(buildingDTO));
-					} else if (fields[i].get(buildingDTO) == null) {
-						statement.setNull(i, Types.NULL);
+				int index = 1;
+				for (Field field : buildingDTO.getClass().getDeclaredFields()) {
+					field.setAccessible(true);
+					if (!field.getName().equals("id") && !field.getName().equals("rentArea") 
+													&& !field.getName().equals("rentAreas") && !field.getName().equals("type")) {
+						statement.setObject(index, field.get(buildingDTO));
+						index++;
+					}else if(field.getName().equals("type")) {
+						String type = convertTypeToString(buildingDTO.getType());
+						statement.setObject(index, type);
+						index++;
 					}
-				} else if (fields[i].getName().equals("type")) {
-					statement.setString(i, convertTypeToString(buildingDTO.getType()));
 				}
 			} catch (IllegalArgumentException | IllegalAccessException | SQLException e) {
 				System.out.println(e.getMessage());
-				e.printStackTrace();
 			}
 		}
 	}
-	
-	public BuildingDTO findById(long id) {
+
+	@SuppressWarnings("unused")
+	@Override
+	public BuildingEntity findById(long id) {
+		BuildingEntity buildingEntity = new BuildingEntity();
 		String sql = "select * from building where id = ?";
-		return findById(sql, id, new BuildingMapper());
+		return buildingEntity = findById(sql, id, new BuildingMapper());
 	}
 
 }

@@ -2,43 +2,44 @@ package com.laptrinhjavaweb.Mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import com.laptrinhjavaweb.dto.BuildingDTO;
+
+import com.laptrinhjavaweb.enity.BuildingEntity;
 
 
-public class BuildingMapper implements RowMapper<BuildingDTO>{
+public class BuildingMapper implements RowMapper<BuildingEntity>{
 
 	@Override
-	public BuildingDTO maprow(ResultSet resultSet) {
-		BuildingDTO buildingDTO = new BuildingDTO();
+	public BuildingEntity maprow(ResultSet resultSet) {
+		BuildingEntity buildingEntity = new BuildingEntity();
 		try {
-			buildingDTO.setName(resultSet.getString("name"));
-			buildingDTO.setId(resultSet.getLong("id"));
-			buildingDTO.setStreet(resultSet.getString("street"));
-			buildingDTO.setWard(resultSet.getString("ward"));
-			buildingDTO.setDistrict(resultSet.getString("district"));
-			buildingDTO.setStructure(resultSet.getString("structure"));
-			buildingDTO.setNumberOfBasement(resultSet.getInt("numberofbasement"));
-			buildingDTO.setFloorarea(resultSet.getInt("floorarea"));
-			buildingDTO.setDirection(resultSet.getString("direction"));
-			buildingDTO.setLevel(resultSet.getString("level"));
-			buildingDTO.setRentprice(resultSet.getInt("rentprice"));
-			buildingDTO.setRentpricedescription(resultSet.getString("rentpricedescription"));
-			buildingDTO.setServicefee(resultSet.getString("servicefee"));
-			buildingDTO.setCarfee(resultSet.getString("carfee"));
-			buildingDTO.setMotofee(resultSet.getString("motofee"));
-			buildingDTO.setOvertimefee(resultSet.getString("overtimefee"));
-			buildingDTO.setWaterfee(resultSet.getString("waterfee"));
-			buildingDTO.setDeposit(resultSet.getString("deposit"));
-			buildingDTO.setPayment(resultSet.getString("payment"));
-			buildingDTO.setRenttime(resultSet.getString("renttime"));
-			buildingDTO.setDecorationtime(resultSet.getString("decorationtime"));
-			buildingDTO.setNote(resultSet.getString("note"));
-			buildingDTO.setLinkofbuilding(resultSet.getString("linkofbuilding"));
-			buildingDTO.setCreateddate(resultSet.getDate("createddate"));
-			buildingDTO.setModifieddate(resultSet.getDate("modifieddate"));
-			buildingDTO.setCreatedby(resultSet.getString("createdby"));
-			buildingDTO.setModifiedby(resultSet.getString("modifiedby"));
-			return buildingDTO;
+			buildingEntity.setName(resultSet.getString("name"));
+			buildingEntity.setId(resultSet.getLong("id"));
+			buildingEntity.setStreet(resultSet.getString("street"));
+			buildingEntity.setWard(resultSet.getString("ward"));
+			buildingEntity.setDistrict(resultSet.getString("district"));
+			buildingEntity.setStructure(resultSet.getString("structure"));
+			buildingEntity.setNumberOfBasement(resultSet.getInt("numberofbasement"));
+			buildingEntity.setFloorArea(resultSet.getInt("floorarea"));
+			buildingEntity.setDirection(resultSet.getString("direction"));
+			buildingEntity.setLevel(resultSet.getString("level"));
+			buildingEntity.setRentPrice(resultSet.getInt("rentprice"));
+			buildingEntity.setRentPriceDescription(resultSet.getString("rentpricedescription"));
+			buildingEntity.setServiceFee(resultSet.getString("servicefee"));
+			buildingEntity.setCarFee(resultSet.getString("carfee"));
+			buildingEntity.setMotoFee(resultSet.getString("motofee"));
+			buildingEntity.setOvertimeFee(resultSet.getString("overtimefee"));
+			buildingEntity.setCarFee(resultSet.getString("waterfee"));
+			buildingEntity.setDeposit(resultSet.getString("deposit"));
+			buildingEntity.setPayment(resultSet.getString("payment"));
+			buildingEntity.setRentTime(resultSet.getString("renttime"));
+			buildingEntity.setDecorationTime(resultSet.getString("decorationtime"));
+			buildingEntity.setNote(resultSet.getString("note"));
+			buildingEntity.setLinkOfBuilding(resultSet.getString("linkofbuilding"));
+			buildingEntity.setCreatedDate(resultSet.getDate("createddate"));
+			buildingEntity.setModifiedDate(resultSet.getDate("modifieddate"));
+			buildingEntity.setCreatedBy(resultSet.getString("createdby"));
+			buildingEntity.setModifiedBy(resultSet.getString("modifiedby"));
+			return buildingEntity;
 		} catch (SQLException e) {
 		System.out.println(e.getMessage());
 		}

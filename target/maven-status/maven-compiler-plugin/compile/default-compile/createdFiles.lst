@@ -1,0 +1,10 @@
+com\laptrinhjavaweb\dto\BuildingDTO.class
+com\laptrinhjavaweb\repository\JDBC\BuildingRepository.class
+com\laptrinhjavaweb\config\JpaAuditingConfig$AuditorAwareImpl.class
+com\laptrinhjavaweb\config\JpaAuditingConfig.class
+com\laptrinhjavaweb\repository\NewRepository.class
+com\laptrinhjavaweb\Service\impl\BuildingServiceIMPL.class
+com\laptrinhjavaweb\repository\JDBC\impl\BuildingRepositoryIMPL.class
+com\laptrinhjavaweb\api\BuildingAPI.class
+com\laptrinhjavaweb\Application.class
+com\laptrinhjavaweb\Service\BuildingService.class
